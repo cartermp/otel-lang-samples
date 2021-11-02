@@ -85,8 +85,7 @@ func main() {
 	// Handle this error in a sensible manner where possible
 	defer func() { _ = tp.Shutdown(ctx) }()
 
-	// Set the Tracer Provider and the W3C Trace Context propagator as globals
-	// I have no idea if this is actually required or not
+	// Set the Tracer Provider and the W3C Trace Context propagator as globals. Important, otherwise this won't let you see distributed traces be connected!
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(
 		propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
