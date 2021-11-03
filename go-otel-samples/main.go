@@ -49,6 +49,10 @@ func newTraceProvider(exp *otlptrace.Exporter) *sdktrace.TracerProvider {
 	return sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exp),
 		sdktrace.WithResource(resource),
+		
+		// Here's how you do sampling and ensure the sample rate is passed on to honeycomb
+		sdktrace.WithSampler(sdktrace.ParentBased(WrappedTraceIDRatioBasedSampler(0.5))),
+		sdktrace.WithSpanProcessor(&honeycombSamplerSpanProcessor{sampleRate: 0.5}),
 	)
 }
 
