@@ -403,6 +403,7 @@ DEPENDENCIES
   opentelemetry-exporter-otlp
   opentelemetry-instrumentation-all
   opentelemetry-sdk
+  opentelemetry-semantic_conventions
   puma (~> 5.0)
   rails (~> 7.0.4)
   selenium-webdriver

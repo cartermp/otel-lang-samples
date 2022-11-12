@@ -67,4 +67,6 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+
+  config.hosts << "3000-cartermp-otellangsample-wn3hye9eu5v.ws-us75.gitpod.io"
 end

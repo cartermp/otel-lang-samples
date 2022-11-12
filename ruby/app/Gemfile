@@ -45,6 +45,7 @@ gem "bootsnap", require: false
 gem 'opentelemetry-sdk'
 gem 'opentelemetry-exporter-otlp'
 gem 'opentelemetry-instrumentation-all'
+gem 'opentelemetry-semantic_conventions'
 
 # Use Sass to process CSS
 # gem "sassc-rails"
