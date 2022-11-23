@@ -1,0 +1,20 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc --build",
+    "start": "ts-node -r ./instrumentation.ts index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@honeycombio/opentelemetry-node": "^0.1.2-beta",
+    "@opentelemetry/auto-instrumentations-node": "^0.35.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}
