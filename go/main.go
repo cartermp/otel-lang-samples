@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"google.golang.org/grpc/credentials"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -29,8 +29,7 @@ func newExporter(ctx context.Context) (*otlptrace.Exporter, error) {
 	opts := []otlptracegrpc.Option{
 		otlptracegrpc.WithEndpoint("api.honeycomb.io:443"),
 		otlptracegrpc.WithHeaders(map[string]string{
-			"x-honeycomb-team":    os.Getenv("HONEYCOMB_TEAM"),
-			"x-honeycomb-dataset": os.Getenv("HONEYCOMB_DATASET"),
+			"x-honeycomb-team": "lol no u",
 		}),
 		otlptracegrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")),
 	}
@@ -43,10 +42,10 @@ func newTraceProvider(exp *otlptrace.Exporter) *sdktrace.TracerProvider {
 	resource :=
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("ExampleService"), // lol no generics
+			semconv.ServiceNameKey.String("phillips-happy-fun-time"), // lol no generics
 		)
 
-	sampler, err := DeterministicSampler(2)
+	sampler, err := DeterministicSampler(1)
 	if err != nil {
 		panic(err) // idk lol
 	}
@@ -54,8 +53,7 @@ func newTraceProvider(exp *otlptrace.Exporter) *sdktrace.TracerProvider {
 	return sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exp),
 		sdktrace.WithResource(resource),
-		sdktrace.WithSampler(sdktrace.ParentBased(sampler)),
-	)
+		sdktrace.WithSampler(sampler),
 	)
 }
 
@@ -69,11 +67,16 @@ func fib(n uint) uint {
 func httpHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	span := trace.SpanFromContext(ctx)
+	span.SetAttributes(attribute.Bool("isTrue", true), attribute.String("stringAttr", "hi!"))
+
 	fib := func(ctx context.Context) uint {
 		_, span := tracer.Start(ctx, "fib")
 		defer span.End()
 
-		return fib(25)
+		span.SetAttributes(attribute.Bool("isTrue", false), attribute.String("stringAttr", "bye!"))
+
+		return fib(2)
 	}(ctx)
 
 	fmt.Fprintf(w, "%d", fib)
@@ -105,6 +108,8 @@ func main() {
 	handler := http.HandlerFunc(httpHandler)
 	wrapedHandler := otelhttp.NewHandler(handler, "hello")
 	http.Handle("/hello", wrapedHandler)
+
+	fmt.Println("doing it")
 
 	log.Fatal(http.ListenAndServe(":3030", nil))
 }

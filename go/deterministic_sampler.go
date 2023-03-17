@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	// "fmt"
 
 	"go.opentelemetry.io/otel/attribute"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -30,6 +32,10 @@ func DeterministicSampler(sampleRate int) (*deterministicSampler, error) {
 func (ds *deterministicSampler) ShouldSample(p sdktrace.SamplingParameters) sdktrace.SamplingResult {
 	attrs := []attribute.KeyValue{
 		attribute.Int("SampleRate", int(ds.sampleRate)),
+	}
+
+	for _, attr := range p.Attributes {
+		fmt.Println(attr)
 	}
 
 	delegatedResult := ds.traceIDRatioSampler.ShouldSample(p)
