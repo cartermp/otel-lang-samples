@@ -45,7 +45,7 @@ func newTraceProvider(exp *otlptrace.Exporter) *sdktrace.TracerProvider {
 			semconv.ServiceNameKey.String("phillips-happy-fun-time"), // lol no generics
 		)
 
-	sampler, err := DeterministicSampler(1)
+	sampler, err := DeterministicAlwaysSampleSampler(1)
 	if err != nil {
 		panic(err) // idk lol
 	}

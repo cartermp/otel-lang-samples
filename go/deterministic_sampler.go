@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	// "fmt"
 
-	"go.opentelemetry.io/otel/attribute"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -14,35 +14,27 @@ var (
 )
 
 type deterministicSampler struct {
-	sampleRate          int
-	traceIDRatioSampler sdktrace.Sampler
+	sampleRate int
+	sampler    sdktrace.Sampler
 }
 
-func DeterministicSampler(sampleRate int) (*deterministicSampler, error) {
-	if sampleRate < 1 {
-		return nil, ErrInvalidSampleRate
-	}
-
+func DeterministicAlwaysSampleSampler(sampleRate int) (*deterministicSampler, error) {
 	return &deterministicSampler{
-		sampleRate:          sampleRate,
-		traceIDRatioSampler: sdktrace.TraceIDRatioBased(1.0 / float64(sampleRate)),
+		sampleRate: 1,
+		sampler:    sdktrace.AlwaysSample(),
 	}, nil
 }
 
 func (ds *deterministicSampler) ShouldSample(p sdktrace.SamplingParameters) sdktrace.SamplingResult {
-	attrs := []attribute.KeyValue{
-		attribute.Int("SampleRate", int(ds.sampleRate)),
-	}
-
 	for _, attr := range p.Attributes {
 		fmt.Println(attr)
 	}
 
-	delegatedResult := ds.traceIDRatioSampler.ShouldSample(p)
+	delegatedResult := ds.sampler.ShouldSample(p)
 
 	return sdktrace.SamplingResult{
 		Decision:   delegatedResult.Decision,
-		Attributes: attrs,
+		Attributes: delegatedResult.Attributes,
 		Tracestate: delegatedResult.Tracestate,
 	}
 }
